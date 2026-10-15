@@ -1,0 +1,53 @@
+{
+  "name": "example policy",
+  "defaults": { "command": "confirm", "file": "allow", "network": "confirm" },
+  "rules": [
+    {
+      "id": "deny-secrets",
+      "action": "deny",
+      "target": "file",
+      "match": {
+        "paths": ["**/.env", "**/.env.*", "**/*.pem", "**/*.key", "**/.ssh/**", "**/.aws/**"]
+      },
+      "reason": "Credential files are off limits."
+    },
+    {
+      "id": "confirm-lockfiles",
+      "action": "confirm",
+      "target": "file",
+      "match": { "paths": ["**/package-lock.json", "**/pnpm-lock.yaml"], "operations": ["write"] },
+      "reason": "Lockfile changes need a checkpoint."
+    },
+    {
+      "id": "deny-destructive-rm",
+      "action": "deny",
+      "target": "command",
+      "match": {
+        "commands": ["\\brm\\s+-rf\\s+[/~]", "\\brm\\s+-fr\\s+[/~]"],
+        "mode": "regex"
+      },
+      "reason": "Recursive delete of root or home is blocked."
+    },
+    {
+      "id": "confirm-sudo",
+      "action": "confirm",
+      "target": "command",
+      "match": { "commands": ["\\bsudo\\b"], "mode": "regex" },
+      "reason": "Elevated commands need a checkpoint."
+    },
+    {
+      "id": "allow-dev-tools",
+      "action": "allow",
+      "target": "command",
+      "match": { "commands": ["git", "npm", "node", "python", "rg"] },
+      "reason": "Common development tools are allowed."
+    },
+    {
+      "id": "allow-local-net",
+      "action": "allow",
+      "target": "network",
+      "match": { "hosts": ["localhost", "127.0.0.1", "::1"] },
+      "reason": "Local services are allowed."
+    }
+  ]
+}
