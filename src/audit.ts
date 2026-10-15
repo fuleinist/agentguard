@@ -81,6 +81,11 @@ export function readAuditEntries(file: string): AuditEntry[] {
   return entries;
 }
 
+/** Newest first (by timestamp). */
+export function sortNewestFirst(entries: AuditEntry[]): AuditEntry[] {
+  return [...entries].sort((a, b) => b.ts.localeCompare(a.ts));
+}
+
 /** Parse a --since value: "30m", "24h", "7d", "all", or an ISO date. */
 export function parseSince(input: string, now: Date = new Date()): Date | null {
   const s = input.trim().toLowerCase();

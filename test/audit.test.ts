@@ -13,6 +13,7 @@ import {
   parseSince,
   readAuditEntries,
   resolveLogPath,
+  sortNewestFirst,
   summarizeRequest,
 } from "../src/audit.js";
 import type { AuditEntry } from "../src/audit.js";
@@ -144,6 +145,14 @@ test("audit: formatAuditLine and summarizeRequest render one line", () => {
   assert.equal(summarizeRequest({ target: "file", path: "a/b.ts" }), "a/b.ts");
   assert.equal(summarizeRequest({ target: "network", host: "x.com" }), "x.com");
   assert.equal(summarizeRequest({ target: "network", url: "https://x.com/a" }), "https://x.com/a");
+});
+
+test("audit: sortNewestFirst orders newest first", () => {
+  const a = sampleEntry({ ts: "2026-10-15T00:00:00.000Z" });
+  const b = sampleEntry({ ts: "2026-10-17T00:00:00.000Z" });
+  const sorted = sortNewestFirst([a, b]);
+  assert.equal(sorted[0].ts, "2026-10-17T00:00:00.000Z");
+  assert.equal(sorted[1].ts, "2026-10-15T00:00:00.000Z");
 });
 
 test("audit: resolveLogPath prefers explicit, then env, then the default", () => {
